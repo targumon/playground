@@ -8,11 +8,11 @@
     <style>
         body {
             margin: 1em;
-            font-size: 32px;
+            font-size: 24px;
             font-family: sans-serif;
             background-color: #246;
             color: #fff;
-            overscroll-behavior: none;
+            /*overscroll-behavior: none;*/
         }
         header {
             float: right;
@@ -33,8 +33,6 @@
             margin: 1em;
             width: 12ch;
         }
-        .online {color: #7d7}
-        .offline {color: #d55}
     </style>
 </head>
 <body>
@@ -48,6 +46,8 @@
     </header>
     <section>
         <button id="share">Share</button>
+        <button id="vibrate">Vibrate</button>
+        <button id="battery">Battery</button>
     </section>
     <div id="status"></div>
     <div id="connection"></div>
@@ -73,25 +73,53 @@
         }
       }
 
-      function updateOnlineStatus() {
-        const condition = navigator.onLine ? 'online' : 'offline'
-        const status = document.getElementById('status')
-        status.className = condition
-        status.innerHTML = condition.toUpperCase()
+      function vibrate() {
+        if (!navigator.vibrate) {
+          log('😞 Error: navigator.vibrate not supported')
+          return
+        }
+
+        navigator.vibrate([250, 250, 125, 125, 125, 125, 250, 250, 250, 600, 250, 250, 250])
+        log('💓 Vibrated?')
       }
 
-      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
-      let type = connection.effectiveType
-      function updateConnectionStatus() {
-        log('Connection change: ' + type + ' -> ' + connection.effectiveType)
-        type = connection.effectiveType
+      function updateOnlineStatus() {
+        const status = document.getElementById('status')
+        status.style.color = navigator.onLine ? '#7d7' : '#d55'
+        status.innerHTML = navigator.onLine ? 'Online' : 'Offline'
       }
-      connection.addEventListener('change', updateConnectionStatus)
+
+      const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection
+      function updateConnectionStatus() {
+        document.getElementById('connection').innerHTML = 'Connection: ' + conn.type + ', category: ' + conn.effectiveType + ', max dl speed: ' + conn.downlinkMax
+      }
+      conn.addEventListener('change', updateConnectionStatus)
+      updateConnectionStatus()
+
+      function secondsToHuman(seconds) {
+        const h = Math.floor(seconds / 3600)
+        const m = Math.floor(seconds % 3600) / 60
+        return (h ? h + 'h' : '') + m + 'm'
+      }
+
+      function battery() {
+        navigator.getBattery().then(function(batt) {
+          log('Battery at ' + batt.level * 100 + '% ' + (batt.charging ? ('🔌 Charging (~' + secondsToHuman(batt.chargingTime) + ' to 100%)') : ('🔋 Not charging (~' + secondsToHuman(batt.dischargingTime) + ' left)')))
+        })
+      }
+
+      function handleVisibilityChange() {
+        log(document.hidden ? ' 🙈 page is hidden' : ' 🐵 page is visible')
+      }
 
       function onLoad() {
         document.querySelector('#share').addEventListener('click', share)
+        document.querySelector('#vibrate').addEventListener('click', vibrate)
+        document.querySelector('#battery').addEventListener('click', battery)
+        document.addEventListener('visibilitychange', handleVisibilityChange)
         window.addEventListener('online',  updateOnlineStatus)
         window.addEventListener('offline', updateOnlineStatus)
+        updateOnlineStatus()
       }
 
       window.addEventListener('load', onLoad)
