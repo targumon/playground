@@ -38,7 +38,7 @@
 <body>
     <header>
         <div>
-            <svg viewBox="10 9 161 23" width="160" fill="#fff">
+            <svg viewBox="10 9 161 23" width="200" fill="#fff" id="logo">
                 <desc>Nemodata Logo</desc>
                 <path d="M15.3 31.7V19h.1l8.7 12.6h4.5V9.8h-5.3v12.6H23L14.5 10H10v21.8h5.3zm31.8 0v-4.3H37v-4.5h9.2v-4.3H37v-4.5h10V9.8H31.9v21.9H47zm8.4 0V18.2h.2l5.2 13.3h3.3l5.3-13.2h.1v13.4h5.2V9.8h-6.6l-5.5 13.6h-.3L57 9.8h-6.5v21.9h5.1zm32.7.3c5.9 0 10.5-4 10.5-11.2 0-7.3-4.6-11.3-10.5-11.3-5.8 0-10.4 4-10.4 11.3 0 7.1 4.6 11.2 10.4 11.2zm0-4.7c-3.1 0-5-2.3-5-6.5s1.9-6.6 5-6.6c3.2 0 5 2.3 5 6.6s-1.8 6.5-5 6.5zm19.5 4.4c6.6 0 10.3-4.1 10.3-11 0-6.8-3.7-10.9-10-10.9h-6.7v21.9h6.4zm-.1-1.8h-4.3V11.6h4.7c5.3 0 8 3.5 8 9.1 0 5.7-2.8 9.2-8.4 9.2zm14.2 1.8l2.4-6.6h9.1l2.4 6.6h2l-7.9-21.9h-2.1l-8 21.9h2.1zm10.9-8.4h-7.9l3.9-10.9h.1l3.9 10.9zm13.8 8.4v-20h7V9.7h-15.9v1.8h7v20h2zm8.9 0l2.3-6.6h9.2l2.3 6.6h2.1l-8-21.9h-2l-8 21.9h2zm10.8-8.4h-7.8l3.8-10.9h.2l3.8 10.9z"></path>
             </svg>
@@ -49,6 +49,7 @@
         <button id="vibrate">Vibrate</button>
         <button id="battery">Battery</button>
     </section>
+    <div id="orientation"></div>
     <div id="status"></div>
     <div id="connection"></div>
     <div id="output"></div>
@@ -112,6 +113,14 @@
         log(document.hidden ? ' 🙈 page is hidden' : ' 🐵 page is visible')
       }
 
+      function updateOrientation() {
+        document.getElementById('orientation').innerHTML = screen.orientation.type.includes('landscape') ? '🚥 Landscape' : '🚦 Portrait'
+      }
+
+      function handleDeviceOrientation (eventData) {
+        document.getElementById('logo').style.transform = 'rotate(' + eventData.gamma + 'deg) rotate3d(1,0,0, ' + (eventData.beta * -1) + 'deg)'
+      }
+
       function onLoad() {
         document.querySelector('#share').addEventListener('click', share)
         document.querySelector('#vibrate').addEventListener('click', vibrate)
@@ -120,6 +129,9 @@
         window.addEventListener('online',  updateOnlineStatus)
         window.addEventListener('offline', updateOnlineStatus)
         updateOnlineStatus()
+        window.addEventListener('deviceorientation', handleDeviceOrientation)
+        screen.orientation.addEventListener('change', updateOrientation)
+        updateOrientation()
       }
 
       window.addEventListener('load', onLoad)
