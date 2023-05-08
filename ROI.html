@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#00908a">
+    <title>Playground</title>
+    <style>
+        .container {
+            display: flex;
+            gap: 4em;
+            padding: 4em;
+        }
+
+        #knobs {
+            width: 320px;
+        }
+        .knob {
+            cursor: pointer;
+        }
+        .knob:hover {
+            filter: contrast(92%);
+        }
+        .knobDot {
+            fill: #17d;
+            transition: transform 0.2s;
+        }
+
+        #chart {
+            width: 640px;
+            font: 10px sans-serif;
+            fill: #246;
+            box-shadow: 0 0 20px #ccc;
+        }
+        .bar {
+            stroke: #246;
+            transition: all 1s;
+        }
+        .bar.pm {
+            fill: #698;
+        }
+        .bar.base {
+            fill: none;
+        }
+        .val.curr {
+            fill: #fff;
+            opacity: 0;
+        }
+        .val.show {
+            opacity: 1;
+            transition: opacity 1s;
+        }
+        table {
+            align-self: center;
+            margin: 4em;
+            height: 100%;
+            font-family: sans-serif;
+            color: #17d;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        table th, table td {
+            padding: 1em 2em;
+        }
+        table td {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <svg viewbox='0 0 224 96' id='knobs' stroke-width='1.5' stroke-linecap='round'>
+            <linearGradient id='knobGrad' x2='0' y2='1'>
+                <stop stop-color='#fff' offset='0'/>
+                <stop stop-color='#ccc' offset='1'/>
+            </linearGradient>
+            <filter id='knobShadow'>
+                <feDropShadow dx='0' dy='1' stdDeviation='4' flood-opacity='0.5'/>
+            </filter>
+            <g id='knobPm' class='knob'>
+                <circle cx='48' cy='48' r='36' fill='url(#knobGrad)' style='filter:url(#knobShadow)'/>
+                <circle cx='48' cy='48' r='32' fill='#eee'/>
+                <circle cx='48' cy='24' r='3' transform-origin='48 48' id='knobPmDot' class='knobDot'/>
+                <path d='M48 1v4' stroke='#999' transform-origin='48 48' transform='rotate(-45)'/>
+                <path d='M48 1v4' stroke='#999' transform-origin='48 48'/>
+                <path d='M48 1v4' stroke='#999' transform-origin='48 48' transform='rotate(45)'/>
+            </g>
+            <g id='knobCm' class='knob' transform='translate(120)'>
+                <circle cx='48' cy='48' r='36' fill='url(#knobGrad)' style='filter:url(#knobShadow)'/>
+                <circle cx='48' cy='48' r='32' fill='#eee'/>
+                <circle cx='48' cy='24' r='3' transform-origin='48 48' id='knobCmDot' class='knobDot'/>
+                <path d='M48 1v4' stroke='#999' transform-origin='48 48' transform='rotate(-45)'/>
+                <path d='M48 1v4' stroke='#999' transform-origin='48 48' transform='rotate(45)'/>
+            </g>
+        </svg>
+
+        <svg viewbox='0 0 320 240' id='chart' text-anchor='middle'>
+            <rect x='30'  width='40' class='bar base pm count'/>
+            <rect x='90'  width='40' class='bar base cm count'/>
+            <rect x='190' width='40' class='bar base pm days' />
+            <rect x='250' width='40' class='bar base cm days' />
+            <rect x='30'  width='40' class='bar curr pm count'/>
+            <rect x='90'  width='40' class='bar curr cm count'/>
+            <rect x='190' width='40' class='bar curr pm days' />
+            <rect x='250' width='40' class='bar curr cm days' />
+            <text x='50'  class='val base pm count'/>
+            <text x='110' class='val base cm count'/>
+            <text x='210' class='val base pm days' />
+            <text x='270' class='val base cm days' />
+            <text x='50'  class='val curr pm count show'/>
+            <text x='110' class='val curr cm count show'/>
+            <text x='210' class='val curr pm days  show'/>
+            <text x='270' class='val curr cm days  show'/>
+            <path stroke='#246' d='M10 200h140m20 0h140'/>
+            <g class='labels'>
+                <text y='230' x='80'>Services</text>
+                <text y='230' x='240'>Downtime (days)</text>
+                <text y='215' x='50' >PM</text>
+                <text y='215' x='110'>CM</text>
+                <text y='215' x='210'>PM</text>
+                <text y='215' x='270'>CM</text>
+            </g>
+        </svg>
+
+        <table><tbody>
+        <tr>
+            <th colspan='2'>Saving</th>
+        </tr>
+        <tr>
+            <td id='saveVal'>-</td>
+            <td id='savePer'>-</td>
+        </tr>
+        <tr style='visibility: hidden'>
+            <td>999</td>
+            <td>100.0%</td>
+        </tr>
+        </tbody></table>
+    </div>
+    <script>
+      const H_MAX = 190
+      const H_OFFSET = 10
+      const T_OFFSET = 10
+      const bars = ['count', 'days']
+      const types = ['pm', 'cm']
+      const state = {pm: 0, cm: 0}
+      const $ = document.querySelector.bind(document)
+      const $$ = document.querySelectorAll.bind(document)
+      const handleVals = type => {
+        $$(`.val.curr.${type}`).forEach(({classList}) => {
+          classList.remove('show')
+          setTimeout(() => classList.add('show'))
+        })
+      }
+      const update = () => {
+        write()
+        draw()
+      }
+      const knobPmClick = () => {
+        state.pm = (state.pm + 1) % 3
+        handleVals('pm')
+        update()
+      }
+      const knobCmClick = () => {
+        state.cm = (state.cm + 1) % 2
+        handleVals('cm')
+        update()
+      }
+      knobPm.addEventListener('click', knobPmClick)
+      knobCm.addEventListener('click', knobCmClick)
+
+      const data = {
+        size: 90,
+        pm: [
+          {
+            count: 491, // 643
+            days: 491, // 2125
+          },
+          {
+            count: 456, // 491
+            days: 456, // 982
+          },
+          {
+            count: 335,
+            days: 335, // 670
+          },
+        ],
+        cm: [
+          {
+            count: 1386,
+            days: 2772, // 3311
+          },
+          {
+            count: 1091,
+            days: 2182,
+          },
+        ],
+      }
+
+      const write = () => {
+        // TODO: FIXME:  || state.cm
+        // $('table').style.opacity = (state.pm) ? 1 : 0
+        // saveVal.textContent = - (data.pm[state.pm].count - data.pm[0].count)
+        // savePer.textContent = (100 * (1 - (data.pm[state.pm].count / data.pm[0].count))).toFixed(1) + '%'
+      }
+
+      const calcYnH = (val, max) => {
+        const height = val / max * H_MAX
+        return {height, y: H_OFFSET + H_MAX - height}
+      }
+      const draw = () => {
+        if (state.cm === 1 && state.pm === 1) {state.pm = 2}
+        const {pm, cm} = state
+        knobPmDot.style.transform = `rotate(${(pm -  1) / 8}turn)`
+        knobCmDot.style.transform = `rotate(${(cm - .5) / 4}turn)`
+        bars.forEach(bar => {
+          const max = Math.max(data.pm[0][bar], data.cm[0][bar])
+          types.forEach(type => {
+            [0, type === 'pm' ? pm : cm].forEach((sel, i) => {
+              const dataSet = i ? 'curr' : 'base'
+              const o = calcYnH(data[type][sel][bar], max)
+              const valEl = $(`.val.${dataSet}.${type}.${bar}`)
+              valEl.textContent = data[type][sel][bar]
+              valEl.setAttribute('y', o.y + T_OFFSET)
+              Object.assign($(`.bar.${dataSet}.${type}.${bar}`).style, o)
+            })
+          })
+        })
+      }
+      draw()
+    </script>
+</body>
+</html>
