@@ -25,6 +25,25 @@ const update = () => {
 const validateState = () => {
   if (state.cm === 1 && state.pm === 1) {state.pm = 2}
 }
+const getOffer = name => {
+  switch (name) {
+    case 'baseline': return {pm: 0, cm: 0}
+    case 'dynamic':  return {pm: 1, cm: 0}
+    case 'prevent':  return {pm: 2, cm: 0}
+    case 'detect':   return {pm: 0, cm: 1}
+    case 'optimize': return {pm: 2, cm: 1}
+    default: return {}
+  }
+}
+const selectorClick = e => {
+  if (e.target.dataset.offer) {
+    $$('#selector .option').forEach(opt => opt.classList.toggle('selected', opt === e.target))
+    Object.assign(state, getOffer(e.target.dataset.offer))
+    handleVals('pm')
+    handleVals('cm')
+    update()
+  }
+}
 const knobPmClick = () => {
   state.pm = (state.pm + 1) % 3
   validateState()
@@ -43,6 +62,7 @@ const toggleClick = () => {
   $('.right').classList.toggle('selected', state.per === 'vehicle')
   update()
 }
+selector.addEventListener('click', selectorClick)
 knobPm.addEventListener('click', knobPmClick)
 knobCm.addEventListener('click', knobCmClick)
 toggle.addEventListener('click', toggleClick)

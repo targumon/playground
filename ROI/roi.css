@@ -40,7 +40,32 @@ dd {
     width: 20vw;
 }
 
+#selector {
+    display: flex;
+    gap: 0.5em;
+    font-size: 0.75em;
+    padding: 0.5em;
+    border: 1px solid #aaa;
+    border-radius: .5em;
+}
+#selector .option {
+    padding: .25em .5em;
+    border: 0;
+    border-radius: .5em;
+    color: #aaa;
+}
+#selector .option:not(.selected):hover {
+    cursor: pointer;
+    color: #888;
+    background-color: #eee;
+}
+#selector .selected {
+    color: #fff;
+    background-color: #17d;
+}
+
 #knobs {
+    display: none;
     width: 320px;
 }
 .knob {
@@ -82,7 +107,7 @@ dd {
     border-radius: 0 .5em .5em 0;
     border-left: 0;
 }
-.selected {
+#toggle .selected {
     color: #17d;
     background-color: #17d1;
 }
