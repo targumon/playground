@@ -117,7 +117,7 @@ table {
     height: 100%;
     font-family: sans-serif;
     color: #17d;
-    /*opacity: 0;*/
+    opacity: 0;
     transition: opacity 0.2s;
 }
 caption {
