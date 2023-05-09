@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta name='theme-color' content='#246'>
+    <link rel='icon' href='../favicon.svg'>
+    <link rel='stylesheet' href='roi.css'>
+    <script defer='defer' src='roi.js'></script>
+    <title>Nemodata ROI</title>
+</head>
+<body>
+    <svg viewBox='0 0 112 16' role='img' aria-label='Nemodata logo' class='logo'>
+        <path d='M13.03.21H9.75v9.8H9.6L2.9.2H0V15.8h3.3v-9.8h.1l6.78 9.8h2.85V.2zm2.05 15.58H25.6v-2.72h-7.23V9.35h6.66V6.64h-6.66V2.93h7.2V.2h-10.5V15.8zM27.52.2V15.8h3.2V5.6h.13l4.02 10.1h2.18l4.03-10.06h.13V15.8h3.2V.2h-4.07l-4.29 10.47h-.18L31.58.2h-4.06zM60.76 8c0-5.1-3.16-8-7.3-8-4.15 0-7.29 2.9-7.29 8 0 5.07 3.14 8 7.3 8 4.13 0 7.29-2.9 7.29-8zm-3.34 0c0 3.3-1.57 5.09-3.95 5.09-2.4 0-3.96-1.79-3.96-5.09s1.56-5.09 3.96-5.09c2.38 0 3.95 1.79 3.95 5.09zm10.39 7.79c4.68 0 7.35-2.93 7.36-7.83 0-4.84-2.63-7.75-7.09-7.75h-4.84V15.8h4.57zm-3.14-1.28V1.49H68c3.78 0 5.78 2.44 5.8 6.47 0 4.07-2.06 6.55-6.08 6.55h-3.06zm12.57 1.28l1.66-4.7h6.54l1.67 4.7h1.49L82.93.2h-1.52L75.74 15.8h1.5zm2.12-5.97l2.76-7.76h.1l2.76 7.76h-5.62zm8.47-8.33h4.94v14.3h1.42V1.49h4.94V.21h-11.3V1.5zm12.03 14.3l1.67-4.7h6.54l1.66 4.7h1.5L105.55.2h-1.52L98.37 15.8h1.5zM102 9.82l2.76-7.76h.1l2.76 7.76H102z'/>
+    </svg>
+    <div class='stats'>
+        Fleet Stats
+        <ul>
+            <li>90 vehicles</li>
+            <li>Class 7,8 trucks <small>(International, Volkswagen, Isuzu, Freightliner, Mercedes-Benz)</small></li>
+            <li>4 basic routines <small>(static maintenance)</small></li>
+        </ul>
+    </div>
+    <div class='container'>
+        <div class='control'>
+            <dl>
+                <dt class='pm0 cm0'>Baseline</dt>
+                <dd class='pm0 cm0'></dd>
+                <dt class='pm1 cm0'>Dynamic Routine</dt>
+                <dd class='pm1 cm0'>Address vehicle changing stress: Vehicles that work harder are maintained&nbsp;first</dd>
+                <dt class='pm2 cm0'>Nemodata Prevent</dt>
+                <dd class='pm2 cm0'>Address systems distinct health deterioration: Each system gets unique maintenance at the right&nbsp;timing</dd>
+                <dt class='pm0 cm1'>Nemodata Detect</dt>
+                <dd class='pm0 cm1'>Address unexpected components behavior early on to reduce unscheduled&nbsp;services</dd>
+                <dt class='pm2 cm1'>Nemodata Optimize</dt>
+                <dd class='pm2 cm1'>Detect + Prevent</dd>
+            </dl>
+            <svg viewbox='0 0 224 96' id='knobs' stroke-width='1.5' stroke-linecap='round'>
+                <linearGradient id='knobGrad' x2='0' y2='1'>
+                    <stop stop-color='#fff' offset='0'/>
+                    <stop stop-color='#ccc' offset='1'/>
+                </linearGradient>
+                <filter id='knobShadow'>
+                    <feDropShadow dx='0' dy='1' stdDeviation='4' flood-opacity='0.5'/>
+                </filter>
+                <g id='knobPm' class='knob'>
+                    <circle cx='48' cy='48' r='36' fill='url(#knobGrad)' style='filter:url(#knobShadow)'/>
+                    <circle cx='48' cy='48' r='32' fill='#eee'/>
+                    <circle cx='48' cy='24' r='3' transform-origin='48 48' id='knobPmDot' class='knobDot'/>
+                    <path d='M48 1v4' stroke='#999' transform-origin='48 48' transform='rotate(-45)'/>
+                    <path d='M48 1v4' stroke='#999' transform-origin='48 48'/>
+                    <path d='M48 1v4' stroke='#999' transform-origin='48 48' transform='rotate(45)'/>
+                </g>
+                <g id='knobCm' class='knob' transform='translate(120)'>
+                    <circle cx='48' cy='48' r='36' fill='url(#knobGrad)' style='filter:url(#knobShadow)'/>
+                    <circle cx='48' cy='48' r='32' fill='#eee'/>
+                    <circle cx='48' cy='24' r='3' transform-origin='48 48' id='knobCmDot' class='knobDot'/>
+                    <path d='M48 1v4' stroke='#999' transform-origin='48 48' transform='rotate(-45)'/>
+                    <path d='M48 1v4' stroke='#999' transform-origin='48 48' transform='rotate(45)'/>
+                </g>
+            </svg>
+            <div id='toggle'>
+                <div class='selected left'>Per fleet</div>
+                <div class='divider'></div>
+                <div class='right'>Per vehicle</div>
+            </div>
+        </div>
+
+        <svg viewbox='0 0 160 240' class='chart' text-anchor='middle'>
+            <rect x='30'  width='40' class='bar base pm count'/>
+            <rect x='90'  width='40' class='bar base cm count'/>
+            <rect x='30'  width='40' class='bar curr pm count'/>
+            <rect x='90'  width='40' class='bar curr cm count'/>
+            <text x='50'  class='val base pm count'/>
+            <text x='110' class='val base cm count'/>
+            <text x='50'  class='val curr pm count show'/>
+            <text x='110' class='val curr cm count show'/>
+
+            <path stroke='#246' d='M10 200h140  '/>
+            <text y='230' x='80'>Services</text>
+            <text y='215' x='50' >PM</text>
+            <text y='215' x='110'>CM</text>
+        </svg>
+        <svg viewbox='160 0 160 240' class='chart' text-anchor='middle'>
+            <rect x='190' width='40' class='bar base pm days' />
+            <rect x='250' width='40' class='bar base cm days' />
+            <rect x='190' width='40' class='bar curr pm days' />
+            <rect x='250' width='40' class='bar curr cm days' />
+            <text x='210' class='val base pm days' />
+            <text x='270' class='val base cm days' />
+            <text x='210' class='val curr pm days  show'/>
+            <text x='270' class='val curr cm days  show'/>
+
+            <path stroke='#246' d='M170 200h140'/>
+            <text y='230' x='240'>Downtime (days)</text>
+            <text y='215' x='210'>PM</text>
+            <text y='215' x='270'>CM</text>
+        </svg>
+
+        <table>
+            <caption>Saving</caption>
+            <tr>
+                <td id='saveSVal'>-</td>
+                <td id='saveSPer'>-</td>
+            </tr>
+            <tr>
+                <td id='saveDVal'>-</td>
+                <td id='saveDPer'>-</td>
+            </tr>
+            <tr class='scaffold'>
+                <td>999 services</td>
+                <td>100.0%</td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
